@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Para ti 💙</title>
+    <style>
+        /* --- ESTILOS GENERALES --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent; /* Quitar azul al tocar en Android */
+        }
+
+        body, html {
+            height: 100%;
+            width: 100%;
+            font-family: 'Comic Sans MS', 'Varela Round', sans-serif; /* Fuente tierna */
+            overflow: hidden; /* El body no hace scroll, lo hace la tarjeta */
+            background-color: #e0f7fa;
+        }
+
+        /* --- FONDO PATRÓN CINNAMOROLL --- */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* REVISA QUE EL NOMBRE DE TU IMAGEN DE FONDO SEA CORRECTO AQUÍ */
+            background-image: url('cinnamon-cinnamon-roll-sanrio-blue-heart-design-hd-wallpaper-preview.jpg'); 
+            background-repeat: repeat;
+            background-size: 100px auto; 
+            opacity: 0.5;
+            z-index: -1;
+        }
+
+        /* --- CONTENEDOR CENTRADO --- */
+        #app-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- LA TARJETA / PÁGINA (AQUÍ ESTÁ LA MAGIA DEL SCROLL) --- */
+        .page {
+            position: absolute;
+            width: 90%; 
+            max-width: 420px;
+            /* Altura dinámica: se ajusta al contenido pero tiene un máximo */
+            max-height: 85vh; 
+            
+            /* ESTO PERMITE BAJAR SI LA IMAGEN ES MUY LARGA */
+            overflow-y: auto; 
+            overflow-x: hidden;
+            
+            background: white; /* Fondo blanco detrás de la imagen por si acaso */
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            
+            /* Animaciones */
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(30px) scale(0.95);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            
+            /* Ocultar barra de scroll fea pero permitir scroll */
+            scrollbar-width: thin; 
+            scrollbar-color: #AEEEEE transparent;
+        }
+
+        /* Estilo para barra de scroll en Chrome/Safari */
+        .page::-webkit-scrollbar {
+            width: 6px;
+        }
+        .page::-webkit-scrollbar-thumb {
+            background-color: #AEEEEE;
+            border-radius: 10px;
+        }
+
+        /* --- CLASES DE ESTADO (ANIMACIÓN) --- */
+        .page.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+            z-index: 10;
+        }
+
+        .page.exit {
+            opacity: 0;
+            transform: translateY(-40px) scale(1);
+        }
+
+        /* --- IMÁGENES --- */
+        .page-content-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            /* La imagen es la base, los botones van relativos a ella o debajo */
+        }
+
+        /* --- BOTONES INVISIBLES (ZONAS DE CLICK) --- */
+        .invisible-hotspot {
+            position: absolute;
+            background-color: transparent; /* Cambiar a rgba(255,0,0,0.3) para probar */
+            cursor: pointer;
+            z-index: 50;
+        }
+
+        /* POSICIONES ESPECÍFICAS DE ZONAS INVISIBLES */
+        
+        /* Página 1: Corazón */
+        #heart-trigger {
+            top: 55%; 
+            left: 38%;
+            width: 24%;
+            height: 15%;
+            border-radius: 50%;
+        }
+
+        /* Página 3: Preguntas */
+        #btn-yes-1 {
+            top: 74%; left: 15%; width: 70%; height: 8%; border-radius: 30px;
+        }
+        #btn-yes-2 {
+            top: 83%; left: 15%; width: 70%; height: 8%; border-radius: 30px;
+        }
+
+        /* --- BOTONES VISIBLES (ESTILO CINNAMOROLL) --- */
+        .buttons-wrapper {
+            background: #fff; /* Asegura fondo blanco donde están los botones */
+            padding: 20px 10px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+
+        .cinna-btn {
+            background-color: #b3e5fc; /* Azul Cinnamoroll */
+            border: 2px solid #fff;
+            color: #0277bd;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(179, 229, 252, 0.6);
+            transition: transform 0.2s, box-shadow 0.2s;
+            flex: 1; /* Ocupan el mismo espacio */
+            max-width: 140px;
+            outline: none;
+        }
+
+        .cinna-btn.back {
+            background-color: #ffffff;
+            border: 2px solid #b3e5fc;
+            color: #81d4fa;
+        }
+
+        .cinna-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Contenedor relativo para poner los botones invisibles encima de la imagen */
+        .relative-container {
+            position: relative;
+            width: 100%;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+
+        <div class="page active" id="page-1">
+            <div class="relative-container">
+                <img src="Carta.png" alt="Carta" class="page-content-image">
+                <div class="invisible-hotspot" id="heart-trigger" onclick="nextPage()"></div>
+            </div>
+            <p style="text-align:center; color:#81d4fa; font-size:0.8rem; padding:10px;">(Toca el corazón)</p>
+        </div>
+
+
+        <div class="page" id="page-2">
+            <img src="Inicio.jpeg" alt="Inicio" class="page-content-image" style="border-radius: 20px 20px 0 0;">
+            
+            <div class="buttons-wrapper">
+                <button class="cinna-btn back" onclick="prevPage()">← Atrás</button>
+                <button class="cinna-btn" onclick="nextPage()">Siguiente →</button>
+            </div>
+        </div>
+
+
+        <div class="page" id="page-3">
+            <div class="relative-container">
+                <img src="Pregunta.jpeg" alt="Pregunta" class="page-content-image">
+                <div class="invisible-hotspot" id="btn-yes-1" onclick="nextPage()"></div>
+                <div class="invisible-hotspot" id="btn-yes-2" onclick="nextPage()"></div>
+            </div>
+        </div>
+
+
+        <div class="page" id="page-4">
+            <img src="Confirmacion.jpeg" alt="Confirmación" class="page-content-image">
+        </div>
+
+    </div>
+
+    <script>
+        let currentPageIndex = 1;
+        const totalPages = 4;
+        let isAnimating = false;
+
+        function nextPage() {
+            if (isAnimating) return;
+            if (currentPageIndex >= totalPages) return;
+            
+            changePage(currentPageIndex + 1);
+        }
+
+        function prevPage() {
+            if (isAnimating) return;
+            if (currentPageIndex <= 1) return;
+
+            changePage(currentPageIndex - 1);
+        }
+
+        function changePage(newIndex) {
+            isAnimating = true;
+            
+            const currentElement = document.getElementById(`page-${currentPageIndex}`);
+            const nextElement = document.getElementById(`page-${newIndex}`);
+
+            // Determinar dirección para efecto visual (opcional, aquí simple fade/slide)
+            currentElement.classList.add('exit');
+            currentElement.classList.remove('active');
+
+            setTimeout(() => {
+                currentElement.classList.remove('exit');
+                
+                // Resetear el scroll de la página nueva para que empiece arriba
+                nextElement.scrollTop = 0;
+                
+                nextElement.classList.add('active');
+                
+                currentPageIndex = newIndex;
+                
+                setTimeout(() => {
+                    isAnimating = false;
+                }, 500);
+            }, 300);
+        }
+    </script>
+</body>
+</html>
